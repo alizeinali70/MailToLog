@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MailToLog.Api/MailToLog.Api.csproj" />
+    <Project Path="src/MailToLog.Application/MailToLog.Application.csproj" />
+    <Project Path="src/MailToLog.Domain/MailToLog.Domain.csproj" />
+    <Project Path="src/MailToLog.Infrastructure/MailToLog.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MailToLog.Tests/MailToLog.Tests.csproj" />
+  </Folder>
+</Solution>
