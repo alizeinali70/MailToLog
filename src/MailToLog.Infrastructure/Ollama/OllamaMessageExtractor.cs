@@ -26,6 +26,7 @@ public sealed class OllamaMessageExtractor(IChatClient chat, IOptions<MailToLogO
       oder eine lange weitergeleitete Kette ist.
     """;
 
+
     public async Task<ExtractionOutcome> ExtractAsync(string text, DateOnly today, CancellationToken ct)
     {
         var sw = Stopwatch.StartNew();

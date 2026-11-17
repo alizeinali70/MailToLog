@@ -16,6 +16,8 @@ await app.Services.InitializeMailToLogAsync();
 
 app.MapHealthChecks("/health");
 
+app.MapHealthChecks("/OllamaHealth");
+
 // Submit an email or transcript. Returns 202 and processes in the background.
 app.MapPost("/messages", async (SubmitRequest req, SubmitMessageHandler handler, CancellationToken ct) =>
 {
