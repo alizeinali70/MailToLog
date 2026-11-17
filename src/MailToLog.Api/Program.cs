@@ -9,6 +9,8 @@ builder.Services.AddMailToLog(builder.Configuration);
 builder.Services.ConfigureHttpJsonOptions(o =>
     o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 await app.Services.InitializeMailToLogAsync();
 
@@ -46,6 +48,12 @@ app.MapPost("/review/{id:guid}/approve", async (Guid id, ReviewHandler handler, 
 
 app.MapPost("/review/{id:guid}/reject", async (Guid id, ReviewHandler handler, CancellationToken ct) =>
     await handler.RejectAsync(id, ct) ? Results.NoContent() : Results.NotFound());
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.Run();
 

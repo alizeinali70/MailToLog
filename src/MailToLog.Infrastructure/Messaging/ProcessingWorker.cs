@@ -7,11 +7,23 @@ using Microsoft.Extensions.Logging;
 namespace MailToLog.Infrastructure.Messaging;
 
 public sealed class ProcessingWorker(
- IMessageQueue queue, IServiceScopeFactory scopes, ILogger<ProcessingWorker> logger)
- : BackgroundService
+    IMessageQueue queue, IServiceScopeFactory scopes, ILogger<ProcessingWorker> logger)
+    : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        // Recovery: re-enqueue messages that were still "Queued" when the app last stopped.
+        await using (var scope = scopes.CreateAsyncScope())
+        {
+            var repo = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
+            var pending = await repo.ListQueuedIdsAsync(stoppingToken);
+
+            foreach (var id in pending)
+                await queue.EnqueueAsync(id, stoppingToken);
+
+            logger.LogInformation("Recovered {Count} queued message(s)", pending.Count);
+        }
+
         await foreach (var id in queue.DequeueAllAsync(stoppingToken))
         {
             try

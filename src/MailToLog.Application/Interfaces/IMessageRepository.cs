@@ -7,4 +7,5 @@ public interface IMessageRepository
     Task<IncomingMessage?> FindByHashAsync(string hash, CancellationToken ct);
     Task<IncomingMessage?> GetAsync(Guid id, CancellationToken ct);
     Task AddAsync(IncomingMessage message, CancellationToken ct);
+    Task<IReadOnlyList<Guid>> ListQueuedIdsAsync(CancellationToken ct);
 }

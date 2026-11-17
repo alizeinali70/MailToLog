@@ -1,5 +1,6 @@
 ﻿using MailToLog.Application.Interfaces;
 using MailToLog.Domain.Entities;
+using MailToLog.Domain.Enums;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -13,7 +14,16 @@ public sealed class SubmitMessageHandler(IMessageRepository messages, IMessageQu
         var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(clean)));
 
         var existing = await messages.FindByHashAsync(hash, ct);   // idempotency
-        if (existing is not null) return (existing.Id, true);
+        if (existing is not null)
+        {
+            if (existing.Status == MessageStatus.Processed) return (existing.Id, true);
+
+            // Still Queued or Failed: retry instead of silently ignoring
+            existing.Status = MessageStatus.Queued;
+            await uow.SaveChangesAsync(ct);
+            await queue.EnqueueAsync(existing.Id, ct);
+            return (existing.Id, true);
+        }
 
         var message = new IncomingMessage { ContentHash = hash, Text = clean };
         await messages.AddAsync(message, ct);

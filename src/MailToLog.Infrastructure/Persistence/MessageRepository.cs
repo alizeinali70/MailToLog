@@ -1,5 +1,6 @@
 ﻿using MailToLog.Application.Interfaces;
 using MailToLog.Domain.Entities;
+using MailToLog.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace MailToLog.Infrastructure.Persistence;
@@ -14,4 +15,11 @@ public sealed class MessageRepository(AppDbContext db) : IMessageRepository
 
     public async Task AddAsync(IncomingMessage message, CancellationToken ct) =>
         await db.Messages.AddAsync(message, ct);
+
+    public async Task<IReadOnlyList<Guid>> ListQueuedIdsAsync(CancellationToken ct) =>
+        await db.Messages.AsNoTracking()
+            .Where(m => m.Status == MessageStatus.Queued)
+            .OrderBy(m => m.ReceivedAtUtc)
+            .Select(m => m.Id)
+            .ToListAsync(ct);
 }

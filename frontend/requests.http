@@ -1,0 +1,23 @@
+@host = https://localhost:5080
+
+### 1. Submit an email
+POST {{host}}/messages
+Content-Type: application/json
+
+{
+ // ##"text": "Von: anna.mueller@beispiel-elektronik.de\nBetreff: Angebot Baugruppe X200\n\nHallo Herr Zeinali,\nbitte senden Sie uns bis zum 15.12.2026 das Angebot für 500 Stück der Baugruppe X200. Ansprechpartnerin ist Anna Müller, Beispiel Elektronik GmbH, Tel. 089 1234567.\nViele Grüße\nAnna Müller"
+    "text": "Hi, wegen gestern, bitte bis Freitag erledigen. Gruß M."
+
+}
+
+### 2. Check status (paste the id from step 1)
+GET {{host}}/messages/100f739c-b30f-4ef2-afda-53616c2c7857
+
+### 3. Pending review entries
+GET {{host}}/review
+
+### 4. Approve (paste the id of an ActivityLog entry)
+POST {{host}}/review/PASTE-LOG-ID-HERE/approve
+
+### Health (including Ollama)
+GET {{host}}/health
